@@ -1,14 +1,13 @@
 
 #include "Planet.hpp"
 
-using namespace std;
 
 Planet::Planet()
 {
 	return;
 }
 
-GLuint Planet::GetTexture(string  file)
+GLuint Planet::GetTexture(string  file,int flag)
 {
   	const char * filename = file.c_str();
   	GLuint texture_id;
@@ -27,6 +26,15 @@ GLuint Planet::GetTexture(string  file)
   	
     if( texture_id > 0 )
     { 
+      if(flag==1)
+      {
+        glBindTexture(GL_TEXTURE_2D, texture_id);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); // Linear Filtering
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR); // Linear Filtering
+        glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+       
+      }
       delete image;
       return texture_id;
     }
@@ -34,33 +42,6 @@ GLuint Planet::GetTexture(string  file)
       return 0;
 }
 
-//Set Background texture
-/*void BackGroundTexture() 
-{
-  glMatrixMode(GL_PROJECTION);
-  //glPushMatrix();
-  //glOrtho(0, 1, 0, 1, 0, 1);
-
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-  glLoadIdentity();
-  
-  
-  texture[0]=GetTexture("stars.png");
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture( GL_TEXTURE_2D, texture[0] );
-  glBegin( GL_QUADS ); 
-    glTexCoord2f( 0, 0 );glVertex2f( 0, 0 );
-    glTexCoord2f( 0, 800 );glVertex2f( 0, 800 );
-    glTexCoord2f( 600, 800 );glVertex2f( 600, 800 );
-    glTexCoord2f( 600, 0 );glVertex2f( 600, 0 );
-  glEnd();
-
-  glPopMatrix();
-  glMatrixMode(GL_PROJECTION);
-  //glPopMatrix();
-  glMatrixMode(GL_MODELVIEW);
-}*/
 void Planet::SunLight(float lightAngle)
 {
 	float XPos=-9,ZPos=9;
@@ -73,7 +54,7 @@ void Planet::SunLight(float lightAngle)
   	float ambientLight[] = { 0.0f, 0.0f, 0.0f, 1.0f };
   	float diffuseLight[] = { 1.0f, 1.0f, 1.0f, 0.0f };
   	//float specularLight[] = { 1.0f, 1.0f, 1.0f, 1.0f }; 
-  	float position[] = { XPos, 0.0f, ZPos, 1.0f }; 
+  	float position[] = { XPos, 0.0f, ZPos, 0.0f }; 
   	//Assign created components to GL_LIGHT0 
   	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight); 
   	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight); 
@@ -93,6 +74,7 @@ void Planet::Earth(float earthAngle,GLuint texture,GLUquadricObj* Sphere)
   
   	glRotatef(90.0,1.0f,0.0f,0.0f);
   	glRotatef(180.0,0.0f,1.0f,0.0f);
+    glRotatef(23.5,-1.0f,-1.0f,0.0f);
   	glRotatef(earthAngle,0.0f,0.0f,1.0f);
   	gluQuadricDrawStyle(Sphere, GLU_FILL);
   	gluQuadricTexture(Sphere, TRUE);
@@ -110,7 +92,7 @@ void Planet::Moon(float xAxis,float zAxis,GLuint texture,GLUquadricObj* Sphere)
   	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
  	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   
-  	glTranslatef(xAxis, 0,zAxis);
+  	glTranslatef(xAxis, 0, zAxis);
   	gluQuadricDrawStyle(Sphere, GLU_FILL);
   	gluQuadricTexture(Sphere, TRUE);
   	gluQuadricNormals(Sphere, GLU_SMOOTH);
